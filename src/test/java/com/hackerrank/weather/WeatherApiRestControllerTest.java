@@ -57,7 +57,7 @@ public class WeatherApiRestControllerTest {
                 .andExpect(jsonPath("$.id", greaterThan(0)))
                 .andExpect(status().isCreated()).andReturn().getResponse().getContentAsString(), Weather.class);
 
-        Assert.assertTrue(new ReflectionEquals(expectedRecord, "id").matches(actualRecord));
+        Assert.assertTrue(new ReflectionEquals(expectedRecord, new String[] {"id","temps"}).matches(actualRecord));
         assertEquals(true, weatherRepository.findById(actualRecord.getId()).isPresent());
     }
 

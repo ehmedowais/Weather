@@ -1,19 +1,51 @@
 package com.hackerrank.weather.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.springframework.format.annotation.DateTimeFormat;
+
+import javax.persistence.*;
+import javax.validation.constraints.Size;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+@Entity
+@Table(name="WEATHER")
 public class Weather {
+    @Id
+    @GeneratedValue(strategy=GenerationType.AUTO)
     private Integer id;
+    @Column(name= "date")
+    //@DateTimeFormat(pattern="YYYY-mm-DD")
     private Date date;
 
+    @Column(name="lat")
     private Float lat;
+    @Column(name="lon")
     private Float lon;
+    @Column(name="city", length = 255)
+    @Size(min=1, max=255, message="Invalid City")
     private String city;
+    @Column(name="state", length = 255)
+    @Size(min=1, max=255, message="Invalid State")
     private String state;
 
-    private List<Double> temperatures;
+    @Column(name="temps", length = 4000)
+    @JsonIgnore
+    private String temps;
 
+    public String getTemps() {
+        return temps;
+    }
+
+    public void setTemps(String temps) {
+        this.temps = temps;
+    }
+
+    @Transient
+    private List<Double> temperatures;
     public Weather(Integer id, Date date, Float lat, Float lon, String city, String state, List<Double> temperatures) {
         this.id = id;
         this.date = date;
@@ -85,10 +117,15 @@ public class Weather {
     }
 
     public List<Double> getTemperatures() {
+        if(this.temps != null) {
+            String[] localTemps = temps.split(",");
+            temperatures = Stream.of(localTemps).map(Double::valueOf).collect(Collectors.toList());
+        }
         return temperatures;
     }
 
     public void setTemperatures(List<Double> temperatures) {
+
         this.temperatures = temperatures;
     }
 }
