@@ -9,10 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
+import javax.websocket.server.PathParam;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -21,15 +19,16 @@ public class WeatherApiRestController {
     @Autowired
     WeatherRepository weatherRepository;
     @GetMapping("/weather")
-    public ResponseEntity<List<Weather>> getWeather(@RequestParam(required = false)
+    public ResponseEntity<Object> getWeather(@RequestParam(required = false)
                                                         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date date, @RequestParam(required = false) String sort,
         @RequestParam(required = false) String city) {
         List<Weather> weathers = null;
+
         if(null != city) {
             List<String> cities = Stream.of(city.split(",", -1))
                     .collect(Collectors.toList());
             cities.replaceAll(String::toLowerCase);
-            weathers = weatherRepository.findAllByCityIn(cities);
+            weathers = weatherRepository.findAllByCityInIgnoreCase(cities);
         }
         if(date == null && city == null) {
             weathers = weatherRepository.findAll();
@@ -52,7 +51,7 @@ public class WeatherApiRestController {
     @PostMapping("/weather")
     public ResponseEntity<Weather> createWeather(@RequestBody Weather request) {
         request.setTemps(request.getTemperatures().stream().map(String::valueOf).collect(Collectors.joining(",")));
-        request.setCity(request.getCity().toLowerCase());
+        //request.setCity(request.getCity().toLowerCase());
         Weather retVal = weatherRepository.save(request);
         return new ResponseEntity<Weather>(retVal, HttpStatus.CREATED);
     }

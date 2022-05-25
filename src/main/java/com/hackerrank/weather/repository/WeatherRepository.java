@@ -8,6 +8,6 @@ import java.util.List;
 
 public interface WeatherRepository extends JpaRepository<Weather, Integer> {
     List<Weather> findAllByDate(Date date);
-    List<Weather> findAllByCityIn(List<String> cities);
+    List<Weather> findAllByCityInIgnoreCase(List<String> cities);
 
 }
