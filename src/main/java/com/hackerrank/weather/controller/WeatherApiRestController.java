@@ -18,6 +18,18 @@ import java.util.stream.Stream;
 public class WeatherApiRestController {
     @Autowired
     WeatherRepository weatherRepository;
+
+    @GetMapping("/weather/{id}")
+    public ResponseEntity<Weather> getWeatherById(@PathVariable Integer id) {
+        Optional<Weather> w = weatherRepository.findById(id);
+        if(w.isPresent()) {
+            return ResponseEntity.ok(w.get());
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+    }
+
     @GetMapping("/weather")
     public ResponseEntity<Object> getWeather(@RequestParam(required = false)
                                                         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date date, @RequestParam(required = false) String sort,
